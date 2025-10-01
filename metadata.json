@@ -1,0 +1,6 @@
+{
+  "name": "WebP - Game code renamer 01 10 2025 - Key input box",
+  "description": "An application to rename .webp image files. It uses OCR (via Gemini API) and filename analysis to identify games based on user-provided table mappings (Game Name, IMS Game Code, Game Provider). Renamed files are exported into a ZIP archive, organized by provider folders. Requires API_KEY environment variable for OCR.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
