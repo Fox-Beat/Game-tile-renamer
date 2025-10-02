@@ -104,10 +104,17 @@
         return null; // No text detected or only marker found
       } catch (error) {
         console.error("Error calling Gemini API:", error);
-        if (error instanceof Error && error.message.includes("API key not valid")) {
-            throw new Error("Invalid API Key for Gemini. Please check the provided key.");
+        
+        let errorMessage = "Failed to extract text using Gemini API.";
+        const errorString = (error instanceof Error) ? error.message.toLowerCase() : JSON.stringify(error).toLowerCase();
+
+        if (errorString.includes("api key not valid")) {
+            errorMessage = "Invalid API Key for Gemini. Please check the provided key.";
+        } else if (errorString.includes("resource_exhausted") || errorString.includes("quota")) {
+            errorMessage = "API rate limit exceeded. Please wait a moment and retry.";
         }
-        throw new Error("Failed to extract text using Gemini API.");
+        
+        throw new Error(errorMessage);
       }
     };
 
@@ -587,7 +594,10 @@
         if (nextImageToProcess) {
           setIsCurrentlyProcessingImage(true);
           processSingleImage(nextImageToProcess, manualFilenameMappings).finally(() => {
-            setIsCurrentlyProcessingImage(false);
+            // Add a delay to avoid hitting API rate limits.
+            setTimeout(() => {
+              setIsCurrentlyProcessingImage(false);
+            }, 1500); // Increased delay to stay safely under API rate limits.
           });
         } else if (startProcessingFlag && processedImages.length > 0) {
           setStartProcessingFlag(false);
